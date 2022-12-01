@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # This build configuration combines the following other build configurations:
 # - `nginx-datadog.cmake`, the actual nginx module source in `src/`,
@@ -36,6 +37,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/opentracing-cpp/include)
 include_directories(opentracing-cpp/3rd_party/include)
 add_subdirectory(./dd-opentracing-cpp EXCLUDE_FROM_ALL)
 include_directories(dd-opentracing-cpp/include)
+add_subdirectory(./libddwaf EXCLUDE_FROM_ALL)
+include_directories(libddwaf/include)
+include_directories(rapidjson/include)
 
 # The shared library (nginx module) that we are building.
 add_library(ngx_http_datadog_module SHARED)
@@ -45,6 +49,7 @@ target_sources(ngx_http_datadog_module
         $<TARGET_OBJECTS:nginx_datadog>
         $<TARGET_OBJECTS:opentracing-object>
         $<TARGET_OBJECTS:dd_opentracing-object>
+        $<TARGET_OBJECTS:libddwaf_objects>
 )
 
 add_dependencies(ngx_http_datadog_module 
@@ -52,6 +57,7 @@ add_dependencies(ngx_http_datadog_module
     nginx_datadog
     opentracing-object
     dd_opentracing-object
+    libddwaf_objects
 )
 
-target_link_libraries(ngx_http_datadog_module dd_opentracing-object -static-libstdc++ -static-libgcc)
+target_link_libraries(ngx_http_datadog_module dd_opentracing-object libddwaf_objects -static-libstdc++ -static-libgcc)

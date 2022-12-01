@@ -7,6 +7,7 @@
 
 #include "datadog_conf.h"
 #include "propagation_header_querier.h"
+#include "security_context.h"
 #include "string_view.h"
 
 extern "C" {
@@ -44,6 +45,7 @@ class RequestTracing {
   PropagationHeaderQuerier propagation_header_querier_;
   std::unique_ptr<ot::Span> request_span_;
   std::unique_ptr<ot::Span> span_;
+  security_context sec_ctx_;
 
   const ot::Span &active_span() const;
 

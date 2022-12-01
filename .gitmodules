@@ -4,3 +4,9 @@
 [submodule "dd-opentracing-cpp"]
 	path = dd-opentracing-cpp
 	url = git@github.com:DataDog/dd-opentracing-cpp.git
+[submodule "libddwaf"]
+	path = libddwaf
+	url = git@github.com:DataDog/libddwaf.git
+[submodule "rapidjson"]
+	path = rapidjson
+	url = git@github.com:Tencent/rapidjson.git

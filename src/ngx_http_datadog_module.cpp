@@ -17,11 +17,14 @@
 #include "load_tracer.h"
 #include "log_conf.h"
 #include "ot.h"
+#include "security_library.h"
 #include "string_util.h"
 #include "string_view.h"
 #include "tracing_library.h"
 
 extern "C" {
+#include <ddwaf.h>
+
 #include <nginx.h>
 #include <ngx_config.h>
 #include <ngx_core.h>
@@ -270,6 +273,14 @@ static ngx_int_t datadog_master_process_post_config(ngx_cycle_t *cycle) noexcept
     }
   }
 
+  for (const auto &env_var_name : security_library::environment_variable_names()) {
+    name = env_var_name;
+    if (const char *value = std::getenv(name.c_str())) {
+      main_conf->environment_variables.push_back(
+          environment_variable_t{.name = name, .value = value});
+    }
+  }
+
   return NGX_OK;
 }
 
@@ -312,6 +323,13 @@ static ngx_int_t datadog_init_worker(ngx_cycle_t *cycle) noexcept try {
   for (const auto &entry : main_conf->environment_variables) {
     const bool overwrite = false;
     ::setenv(entry.name.c_str(), entry.value.c_str(), overwrite);
+  }
+
+  // FIXME check the environment variables?
+  try {
+    security_library::initialise_security_library();
+  } catch (const std::exception &e) {
+     ngx_log_error(NGX_LOG_ERR, cycle->log, 0, "Initialising security library failed: %s", e.what());
   }
 
   std::shared_ptr<ot::Tracer> tracer = load_tracer(cycle->log, str(main_conf->tracer_conf));

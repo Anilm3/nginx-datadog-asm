@@ -11,6 +11,7 @@
 #include "ot.h"
 #include "string_util.h"
 #include "tracing_library.h"
+#include <ddwaf.h>
 
 namespace datadog {
 namespace nginx {
@@ -162,6 +163,8 @@ void RequestTracing::on_exit_block(std::chrono::steady_clock::time_point finish_
 
 void RequestTracing::on_log_request() {
   auto finish_timestamp = std::chrono::steady_clock::now();
+
+  sec_ctx_.on_log_request(request_, *request_span_);
 
   on_exit_block(finish_timestamp);
 

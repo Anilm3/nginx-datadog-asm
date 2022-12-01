@@ -18,7 +18,7 @@ sources: dd-opentracing-cpp/.git opentracing-cpp/.git nginx/
 .PHONY: build-deps
 build-deps: sources dd-opentracing-cpp-deps
 
-dd-opentracing-cpp/.git opentracing-cpp/.git:
+dd-opentracing-cpp/.git opentracing-cpp/.git libddwaf/.git:
 	git submodule update --init --recursive
 
 dd-opentracing-cpp/scripts/install_dependencies.sh: dd-opentracing-cpp/.git
